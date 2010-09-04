@@ -1,4 +1,3 @@
-import pygame
 from pygame import *
 
 class Word:
@@ -8,4 +7,4 @@ class Word:
 		self.text = text
 		self.surface = None
 		self.on_screen = False
-		self.pos = Rect(0,0,1,1)
+		self.pos = pygame.Rect(0,0,1,1)
