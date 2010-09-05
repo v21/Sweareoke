@@ -66,13 +66,14 @@ class Game:
             try:
                 word.resp = self.forvo.queryWord(word.text)
             except NoRecordingsError:
+                print "Couldn't find: " + word.text
                 continue
             try:
+                print "trying " + word.resp.word
                 word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
                 #if postProcess:
-                word.audiofile = self.forvo.postprocessAudio(word.audiofile)
-
-                self.sound = pygame.mixer.Sound(word.audiofile)
+                word.audiofile = self.forvo.postprocessAudio(word.audiofile, True)
+                word.sound = pygame.mixer.Sound(word.audiofile)
             except NoRecordingsError:
                 print "Couldn't find: " + word.text
         
@@ -94,11 +95,21 @@ class Game:
                 if (word.column == column and 
                         word.time > current_time - self.error_margin and
                         word.time < current_time + self.error_margin):
-                    self.display.correct(column)
+                    self.correct(word)
                     word.hit = True
                     return
-            self.display.incorrect(column)
-       
+            self.incorrect(column)
+
+    def correct(self, word):
+        try:
+            channel = word.sound.play()
+        except:
+            pass
+        self.display.correct(word.column)
+
+    def incorrect(self, column):
+        self.display.incorrect(column)
+
     def check_words(self, time):
         if (self.level != 0):
             for word in self.all_words:
