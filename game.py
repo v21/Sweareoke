@@ -56,6 +56,7 @@ class Game:
         self.display.init()
         self.display.load_title()
         self.song = pygame.mixer.music.load(self.filename)
+        pygame.mixer.music.set_volume(0.4)
         if (pygame.joystick.get_count() > 0):
             self.guitar = pygame.joystick.Joystick(0)
             self.guitar.init()
@@ -84,6 +85,7 @@ class Game:
         
 
             word.sound = pygame.mixer.Sound(word.audiofile)
+            word.sound.set_volume(0.2)
 
         self.get_swears()
 
@@ -95,11 +97,13 @@ class Game:
                 word.resp = self.forvo.queryWord(word.text)
                 word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
                 word.audiofile = self.forvo.postprocessAudio(word.audiofile)
+                word.sound = pygame.mixer.Sound(word.audiofile)
+                word.sound.set_volume(1)
+                self.swears.append(word)
             except:
                 print "no swear " + swear
                 continue
 
-            self.swears.append(word)
        
     def synthesize_word(self, word):
         word_text_file = "tmp_word.txt"
@@ -145,6 +149,13 @@ class Game:
         self.display.correct(word.column)
 
     def incorrect(self, column):
+        swear = self.swears[randint(0,len(self.swears)-1)]
+        try:
+            print " play swear"
+            channel = swear.sound.play()
+        except:
+            print "cant play swear"
+            pass
         self.display.incorrect(column)
 
     def check_words(self, time):
