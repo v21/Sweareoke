@@ -28,7 +28,7 @@ class ForvoLibrary:
 
     def queryWord(self, word):
         word = word.lower()
-        m = re.match(r"\w+", word)
+        m = re.search(r"\w+", word)
         if m:
             word = m.group(0)
         else:
@@ -57,7 +57,7 @@ class ForvoLibrary:
         if (resp.num_recordings == 0) :
             raise NoRecordingsError
         url = resp.recordings[which]["ogg"]
-        filename = self.recording_loc + "/" + word + "_" + resp.recordings[which]["id"] + ".ogg"
+        filename = self.recording_loc + word + "_" + resp.recordings[which]["id"] + ".ogg"
         if os.path.exists(filename):
             return filename
         else:
@@ -90,7 +90,8 @@ class ForvoLibrary:
         if os.path.exists(new_filename) and not force_reprocess:
             return new_filename
         else:
-            retcode = call(["sox", filename, new_filename, "silence", "1", "0.1", "3%"])
+            print "processing " + filename
+            retcode = call(["sox", filename, new_filename, "silence", "1", "0.1", "3%", "norm"])
             return new_filename
 
 class NoRecordingsError(Exception):
