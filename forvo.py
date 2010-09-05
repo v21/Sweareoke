@@ -18,6 +18,13 @@ class ForvoLibrary:
         self.cache = {} # {"word":ForvoResponse(), ...}
         self.recording_loc = "sounds"
 
+    def loadOldFiles(self):
+        files = os.listdir(self.recording_loc)
+        for file in files:
+            (name, ext) = os.path.spltext(file)
+            (word, underscore, key) = name.partition("_")
+            self.cache[word] = key
+
     def queryWord(self, word):
 
         if self.cache.has_key(word): #links will stop working after 2 hours. this aint a problem now.
@@ -33,11 +40,11 @@ class ForvoLibrary:
         self.cache[word] = resp
         return resp
 
-    def fetchRecording(self, resp, which):
+    def fetchRecording(self, resp, which, word):
         if (resp.num_recordings == 0) :
             raise NoRecordingsError
         url = resp.recordings[which]["ogg"]
-        filename = self.recording_loc + "/" + resp.recordings[which]["id"] + ".ogg"
+        filename = self.recording_loc + "/" + word + "_" + resp.recordings[which]["id"] + ".ogg"
         if os.path.exists(filename):
             return filename
         else:
@@ -51,7 +58,7 @@ class ForvoLibrary:
         for word in words:
             resp = self.queryWord(word)
             try:
-                filename = self.fetchRecording(resp,default_which)
+                filename = self.fetchRecording(resp,default_which, word)
                 filenames[word] = filename
             except NoRecordingsError:
                 print "Couldn't find: " + word
