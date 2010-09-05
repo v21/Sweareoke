@@ -52,8 +52,9 @@ class Game:
     def init(self):
         self.display.init()
         self.display.load_title()
-        self.guitar = pygame.joystick.Joystick(0)
-        self.guitar.init()
+        if (pygame.joystick.get_count() > 0):
+            self.guitar = pygame.joystick.Joystick(0)
+            self.guitar.init()
         list_of_words = [word.text for word in self.all_words]
         words_to_filenames = self.forvo.queryAndFetchMultiple(list_of_words)
         for word in words_to_filenames:
@@ -133,6 +134,9 @@ if (__name__ == "__main__"):
         filename = "american.kar"
     game = Game()
     game.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(filename))
+    game.all_words = [game.all_words[i] for i in range(5)]
+    for word in game.all_words:
+        print word
     game.init()
     game.song = pygame.mixer.music.load(filename)
     game.main_loop()
