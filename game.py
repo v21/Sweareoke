@@ -3,6 +3,7 @@ from gfx import *
 from word import *
 import wrapperpykar
 from random import randint
+import sys
 
 class Game:
     def __init__(self):
@@ -48,6 +49,7 @@ class Game:
         self.display.load_title()
         self.guitar = pygame.joystick.Joystick(0)
         self.guitar.init()
+        self.start_song()
 
 
     def start_song(self):
@@ -102,7 +104,12 @@ class Game:
             self.display.draw()
             pygame.time.wait(33)
 
-
-game = Game()
-game.init()
-game.main_loop()
+if (__name__ == "__main__"):
+    if (len(sys.argv) > 1):
+        filename = sys.argv[1]
+    else:
+        filename = "american.kar"
+    game = Game()
+    game.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(filename))
+    game.init()
+    game.main_loop()
