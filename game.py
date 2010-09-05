@@ -110,6 +110,14 @@ class Game:
 
                 elif event.key == K_y:
                     self.respond_to_strum(0)
+                elif event.key == K_u:
+                    self.respond_to_strum(1)
+                elif event.key == K_i:
+                    self.respond_to_strum(2)
+                elif event.key == K_o:
+                    self.respond_to_strum(3)
+                elif event.key == K_p:
+                    self.respond_to_strum(4)
 
                 if event.key == K_ESCAPE:
                     self.run = False
@@ -118,8 +126,15 @@ class Game:
                 if self.level == 1:
                     if event.key == K_y:
                         self.respond_to_strum_off(0)
+                    elif event.key == K_u:
+                        self.respond_to_strum_off(1)
+                    elif event.key == K_i:
+                        self.respond_to_strum_off(2)
+                    elif event.key == K_o:
+                        self.respond_to_strum_off(3)
+                    elif event.key == K_p:
+                        self.respond_to_strum_off(4)
 
-                    
             elif event.type == JOYBUTTONDOWN:
                 if event.button in self.buttons:
                     if self.level == 0:
