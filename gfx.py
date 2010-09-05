@@ -80,16 +80,16 @@ class Display:
 
     def correct(self, column):
         print "YEAHAHHAAH!" + str(column)
-        pictures.append(Picture(
-            correct_image, 
-            (column_centre(column+1), self.screen.get_height() - bottom_offset),
+        self.pictures.append(Picture(
+            self.correct_image, 
+            (self.column_centre(column), self.screen.get_height() - self.bottom_offset),
             1000))
 
     def incorrect(self, column):
         print "NOONONONO!!" + str(column)
-        pictures.append(Picture(
-            incorrect_image, 
-            (column_centre(column+1), self.screen.get_height() - bottom_offset),
+        self.pictures.append(Picture(
+            self.incorrect_image, 
+            (self.column_centre(column), self.screen.get_height() - self.bottom_offset),
             1000))
 
     def column_centre(self, column):
@@ -147,7 +147,7 @@ class Display:
         for picture in self.pictures:
             picture.time -= delta
 
-        pictures = [picture for picture in pictures if picture.time > 0]
+        self.pictures = [picture for picture in self.pictures if picture.time > 0]
 
 
         self.time_text = self.big_font.render(str(time), 1, (0, 0, 0))
@@ -168,8 +168,10 @@ class Display:
                 self.screen.blit(button, (self.column_left(i), self.screen.get_height() - self.bottom_offset))
             i += 1
         
-        for picture in pictures:
-            self.screen.blit(picture.surface, picture.pos)
+        for picture in self.pictures:
+            rect = picture.surface.get_rect()
+            rect.center = picture.pos
+            self.screen.blit(picture.surface, rect)
 
         pygame.display.flip()
 
