@@ -18,25 +18,6 @@ class Game:
 
         lyrics = wrapperpykar.parse_midi("american.kar")
         self.all_words = wrapperpykar.clean_syllables(lyrics)
-        #self.all_words = [
-#                Word(1000, "One") ,
-#                Word(2000, "One") ,
-#                Word(3000, "One") ,
-#                Word(4000, "One") ,
-#                Word(5000, "One") ,
-#                Word(6000, "One") ,
-#                Word(7000, "One") ,
-#                Word(8000, "One") ,
-#                Word(9000, "One") ,
-#                Word(10000, "One") ,
-#                Word(11000, "One") ,
-#                Word(12000, "One") ,
-#                Word(13000, "One") ,
-#                Word(14000, "One") ,
-#                Word(15000, "One") ,
-#                Word(16000, "One") ,
-#                Word(17000, "One") ,
-#                Word(20000, "Two")]
         
         self.display = Display(self.time_window)
 

@@ -8,6 +8,8 @@ class Display:
     def __init__(self, time_window):
         self.blitables = []
         self.words = []
+        self.buttons_pressed = [False for x in range(5)]
+        self.buttons = []
         self.screen = None
         self.bg_colour = (0,255,255)
         self.time = 0
@@ -15,6 +17,22 @@ class Display:
         self.time_text = None
         self.difficulty = 3
         self.bottom_offset = 40
+        self.match_bar_height = 20
+        self.button_colours = [
+                (0,255,0),
+                (255,0,0),
+                (255, 255, 0),
+                (0,0,255),
+                (255,180,0)]
+
+    def make_buttons(self):
+        buttons = []
+        for i in range(5):
+            button = pygame.Surface((float(self.screen.get_width())/float(7), self.match_bar_height)).convert()
+            button.fill(self.button_colours[i])
+            buttons.append(button)
+        return buttons
+
 
     def init(self):
         pygame.init()
@@ -22,6 +40,7 @@ class Display:
         pygame.display.set_caption('Sweareoke!!')
         self.big_font = pygame.font.Font(None, 100)
         self.small_font = pygame.font.Font(None, 60)
+        self.buttons = self.make_buttons()
 
     def load_title(self):
         # Fill background
@@ -38,6 +57,10 @@ class Display:
 
         self.blitables.append((background, (0,0)))
 
+    def push_button(self, column):
+        self.buttons_pressed[column] = True
+
+
     def correct(self, column):
         print "YEAHAHHAAH!" + str(column)
         a = None
@@ -45,6 +68,12 @@ class Display:
     def incorrect(self, column):
         print "NOONONONO!!" + str(column)
         a = None
+
+    def column_centre(self, column):
+        return (float(self.screen.get_width())/float(7)) * float(column+1.5)
+
+    def column_left(self, column):
+        return (float(self.screen.get_width())/float(7)) * float(column+1)
 
     def load_main(self, words, difficulty):
         self.difficulty = difficulty
@@ -58,26 +87,22 @@ class Display:
         self.blitables.append((background, (0,0)))
 
         #match line
-        match_line = pygame.Surface((self.screen.get_width(), 20)).convert()
+        match_line = pygame.Surface((self.screen.get_width(), self.match_bar_height)).convert()
         match_line.fill((255,255,255))
         self.blitables.append((match_line, (0,self.screen.get_height()-self.bottom_offset)))
+
+        #bowling alleys
+        for i in range(0,6):
+            alley = pygame.Surface((4, self.screen.get_height())).convert()
+            alley.fill((255,255,255))
+            self.blitables.append((alley, (self.column_left(i), 0)))
         
         self.words = words
         for word in words:
-            colour = (0,0,0)
-            if (word.column == 1):
-                colour = (0,255,0)
-            elif (word.column == 2):
-                colour = (255,0,0)
-            elif (word.column == 3):
-                colour = (255, 255, 0)
-            elif (word.column == 4):
-                colour = (0,0,255)
-            elif (word.column == 5):
-                colour = (255,180,0)
+            colour = self.button_colours[word.column]
             word.surface = self.small_font.render(word.text, 1, colour)
             word.pos = word.surface.get_rect()
-            word.pos.centerx = (float(self.screen.get_width())/float(difficulty+2)) * float(word.column+1)
+            word.pos.centerx = self.column_centre(word.column)
 
         self.time_text = self.big_font.render("0", 1, (255,255,255))
     
@@ -105,6 +130,9 @@ class Display:
                 self.screen.blit(word.surface, word.pos)
 
         self.screen.blit(self.time_text, (0,0))
+
+        #for button in buttons
+        #self.screen.blit(self.get_column_left(column))
             
 
         pygame.display.flip()
