@@ -19,8 +19,7 @@ class Game:
         self.difficulty = 5
         self.error_margin = 500
 
-        lyrics = wrapperpykar.parse_midi("american.kar")
-        self.all_words = wrapperpykar.clean_syllables(lyrics)
+        self.all_words = []
         
         self.display = Display(self.time_window)
 
@@ -128,6 +127,7 @@ if (__name__ == "__main__"):
         filename = "american.kar"
     game = Game()
     game.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(filename))
+    
     game.init()
     game.song = pygame.mixer.music.load(filename)
     game.main_loop()
