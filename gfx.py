@@ -150,14 +150,14 @@ class Display:
         self.pictures = [picture for picture in self.pictures if picture.time > 0]
 
 
-        self.time_text = self.big_font.render(str(time), 1, (0, 0, 0))
+        #self.time_text = self.big_font.render(str(time), 1, (0, 0, 0))
 
     def draw(self):
         # Blit everything to the screen
         for blitable in self.blitables:
             self.screen.blit(blitable[0], blitable[1])
 
-        self.screen.blit(self.time_text, (0,0))
+        #self.screen.blit(self.time_text, (0,0))
 
         i = 0
         for button in self.buttons:
