@@ -156,9 +156,6 @@ class Display:
         # Blit everything to the screen
         for blitable in self.blitables:
             self.screen.blit(blitable[0], blitable[1])
-        for word in self.words:
-            if word.on_screen:
-                self.screen.blit(word.surface, word.pos)
 
         self.screen.blit(self.time_text, (0,0))
 
@@ -172,6 +169,10 @@ class Display:
             rect = picture.surface.get_rect()
             rect.center = picture.pos
             self.screen.blit(picture.surface, rect)
+        
+        for word in self.words:
+            if word.on_screen:
+                self.screen.blit(word.surface, word.pos)
 
         pygame.display.flip()
 
