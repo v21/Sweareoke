@@ -65,17 +65,21 @@ class Game:
             print "fetching " + word.text
             try:
                 word.resp = self.forvo.queryWord(word.text)
-            except NoRecordingsError:
-                continue
-            try:
                 word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
-                #if postProcess:
                 word.audiofile = self.forvo.postprocessAudio(word.audiofile)
-
-                self.sound = pygame.mixer.Sound(word.audiofile)
             except NoRecordingsError:
                 print "Couldn't find: " + word.text
-        
+                word.audiofile = synthesize_word(word.text)
+
+            word.sound = pygame.mixer.Sound(word.audiofile)
+       
+    def synthesize_word(self, word):
+        word_text_file = "tmp_word.txt"
+        filename = "sounds/processed/" + word + "_000.wav"
+        os.system("echo '" + word + "' > " + word_text_file)
+        os.system("text2wave -o " + filename + " " + word_text_file)
+        return filename
+
     def start_song(self):
         self.song_start_time = pygame.time.get_ticks()
         for word in self.all_words:
