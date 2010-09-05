@@ -62,7 +62,7 @@ class Game:
 
         self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
 
-        self.all_words = [self.all_words[i] for i in range(6)]
+        #self.all_words = [self.all_words[i] for i in range(6)]
         for word in self.all_words:
             print "fetching " + word.text
             try:
@@ -78,7 +78,7 @@ class Game:
                 print "trying " + word.resp.word
                 word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
                 #if postProcess:
-                word.audiofile = self.forvo.postprocessAudio(word.audiofile, True)
+                word.audiofile = self.forvo.postprocessAudio(word.audiofile)
             except NoRecordingsError:
                 print "Couldn't find: " + word.text
         
