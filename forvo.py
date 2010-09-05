@@ -20,7 +20,7 @@ class ForvoLibrary:
         try:
             with open(self.cachePickled) as f:
                 self.cache = pickle.load(f)
-                print "loaded: " + self.cache
+                #print "loaded: " + self.cache
         except:
             self.cache = {}
             print "failed to load cache"
@@ -30,7 +30,7 @@ class ForvoLibrary:
     def queryWord(self, word):
 
         if self.cache.has_key(word): #links will stop working after 2 hours. this aint a problem now.
-            print "returning from cache"
+            #print "returning from cache"
             return self.cache[word]
 
         url_start = "http://apifree.forvo.com/action/word-pronunciations/format/json/word/"
@@ -43,7 +43,7 @@ class ForvoLibrary:
         self.cache[word] = resp
         with open(self.cachePickled, "wb") as f:
             pickle.dump(self.cache, f)
-        print "dumped to file"
+        #print "dumped to file"
         return resp
 
     def fetchRecording(self, resp, which):
