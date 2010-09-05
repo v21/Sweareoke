@@ -21,8 +21,7 @@ class Game:
         self.difficulty = 5
         self.error_margin = 500
 
-        lyrics = wrapperpykar.parse_midi("american.kar")
-        self.all_words = wrapperpykar.clean_syllables(lyrics)
+        self.all_words = []
         
         self.display = Display(self.time_window)
         self.forvo = ForvoLibrary()
@@ -49,16 +48,25 @@ class Game:
 
         self.buttons = [self.green, self.red, self.yellow, self.blue, self.orange]
 
+        self.filename = ""
+
     def init(self):
         self.display.init()
         self.display.load_title()
         if (pygame.joystick.get_count() > 0):
             self.guitar = pygame.joystick.Joystick(0)
             self.guitar.init()
-        list_of_words = [word.text for word in self.all_words]
-        words_to_filenames = self.forvo.queryAndFetchMultiple(list_of_words)
-        for word in words_to_filenames:
-            self.word_sounds[word] = pygame.mixer.Sound(words_to_filenames[filename]) 
+
+        self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
+        
+        game.all_words = [game.all_words[i] for i in range(6)]
+        for word in game.all_words:
+            print word
+        
+        words = [word.text for word in self.all_words]
+        filenames = self.forvo.queryAndFetchMultiple(words, True)
+        for word, filename in filenames:
+            self.word_sounds[word] = pygame.mixer.Sound(filename)
 
     def start_song(self):
         self.song_start_time = pygame.time.get_ticks()
@@ -128,15 +136,13 @@ class Game:
             pygame.time.wait(33)
 
 if (__name__ == "__main__"):
-    if (len(sys.argv) > 1):
-        filename = sys.argv[1]
-    else:
-        filename = "american.kar"
     game = Game()
-    game.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(filename))
-    game.all_words = [game.all_words[i] for i in range(5)]
-    for word in game.all_words:
-        print word
+
+    if (len(sys.argv) > 1):
+        game.filename = sys.argv[1]
+    else:
+        game.filename = "american.kar"
+
     game.init()
     game.song = pygame.mixer.music.load(filename)
     game.main_loop()

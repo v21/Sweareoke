@@ -12,7 +12,6 @@ class ForvoResponse:
         self.recordings = [{"ogg":resp[u"pathogg"], "id": resp[u"id"]} for resp in jsonResp[u"items"]]
         self.json = jsonResp
 
-
 class ForvoLibrary:
     def __init__(self):
         self.api_key = "32afdf084bda652565de09c55de855e3"
@@ -28,6 +27,9 @@ class ForvoLibrary:
         self.recording_postproc_loc = "sounds/processed/"
 
     def queryWord(self, word):
+        word = word.lower()
+        m = re.match(r"\w+", word)
+        word = m.group(0)
 
         if self.cache.has_key(word): #links will stop working after 2 hours. this aint a problem now.
             #print "returning from cache"
@@ -41,6 +43,7 @@ class ForvoLibrary:
         f = urllib.urlopen(url)
 
         resp = ForvoResponse(json.load(f))
+        resp.word = word
         self.cache[word] = resp
         with open(self.cachePickled, "wb") as f:
             pickle.dump(self.cache, f)
@@ -64,6 +67,7 @@ class ForvoLibrary:
         filenames = {}
         for word in words:
             resp = self.queryWord(word)
+            word = resp.word #preserve cleaning
             try:
                 filename = self.fetchRecording(resp,default_which, word)
                 if postProcess:
