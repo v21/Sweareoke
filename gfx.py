@@ -60,6 +60,9 @@ class Display:
     def push_button(self, column):
         self.buttons_pressed[column] = True
 
+    def unpush_button(self, column):
+        self.buttons_pressed[column] = False
+
 
     def correct(self, column):
         print "YEAHAHHAAH!" + str(column)
@@ -119,6 +122,7 @@ class Display:
             else:
                 word.on_screen = False
 
+
         self.time_text = self.big_font.render(str(time), 1, (0, 0, 0))
 
     def draw(self):
@@ -131,8 +135,11 @@ class Display:
 
         self.screen.blit(self.time_text, (0,0))
 
-        #for button in buttons
-        #self.screen.blit(self.get_column_left(column))
+        i = 0
+        for button in self.buttons:
+            if (self.buttons_pressed[i]):
+                self.screen.blit(button, (self.column_left(i), self.screen.get_height() - self.bottom_offset))
+            i += 1
             
 
         pygame.display.flip()

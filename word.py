@@ -9,6 +9,7 @@ class Word:
         self.on_screen = False
         self.pos = pygame.Rect(0,0,1,1)
         self.column = 0
+        self.hit = False
 
     def __repr__(self):
         return "Word(" + str(self.time) + ", \"" + str(self.text) + "\")"

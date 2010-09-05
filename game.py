@@ -14,6 +14,8 @@ class Game:
         self.time_window = 5000
         self.song_start_time = 0
 
+        self.song = None
+
         self.difficulty = 5
         self.error_margin = 500
 
@@ -49,7 +51,7 @@ class Game:
         self.display.load_title()
         self.guitar = pygame.joystick.Joystick(0)
         self.guitar.init()
-        self.start_song()
+        #self.start_song()
 
 
     def start_song(self):
@@ -57,6 +59,7 @@ class Game:
         for word in self.all_words:
             word.column = randint(0, self.difficulty-1)
         self.display.load_main(self.all_words, self.difficulty)
+        pygame.mixer.music.play()
     
     def respond_to_strum_off(self, column):
         self.buttons_pressed[column] = False
@@ -70,9 +73,16 @@ class Game:
                         word.time > current_time - self.error_margin and
                         word.time < current_time + self.error_margin):
                     self.display.correct(column)
+                    word.hit = True
                     return
             self.display.incorrect(column)
-        
+       
+    def check_words(self, time):
+        if (self.level != 0):
+            for word in self.all_words:
+                if (word.time < time - self.error_margin and not word.hit):
+                    word.hit = True
+                    self.display.incorrect(word.column)
 
     def process_input(self):
         for event in pygame.event.get():
@@ -82,9 +92,15 @@ class Game:
                 if event.key == K_ESCAPE:
                     self.run = False
             elif event.type == JOYBUTTONDOWN:
-                if self.level == 0:
-                    self.level = 1
-                    self.start_song()
+                if event.button in self.buttons:
+                    if self.level == 0:
+                        self.level = 1
+                        self.start_song()
+                    else:
+                        self.display.push_button(self.sound_button_map[event.button])
+            elif event.type == JOYBUTTONUP:
+                if event.button in self.buttons:
+                    self.display.unpush_button(self.sound_button_map[event.button])
             elif event.type == JOYAXISMOTION:
                 for button in self.buttons:
                     column = self.sound_button_map[button]
@@ -100,6 +116,7 @@ class Game:
         while (self.run):
             self.process_input()
             time = pygame.time.get_ticks() - self.song_start_time
+            self.check_words(time)
             self.display.update(time)
             self.display.draw()
             pygame.time.wait(33)
@@ -112,4 +129,5 @@ if (__name__ == "__main__"):
     game = Game()
     game.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(filename))
     game.init()
+    game.song = pygame.mixer.music.load(filename)
     game.main_loop()
