@@ -1,6 +1,7 @@
 
 import pygame
 from pygame.locals import *
+from random import randint
 
 class Display:
 
@@ -12,6 +13,8 @@ class Display:
 		self.time = 0
 		self.time_window = time_window
 		self.time_text = None
+		self.difficulty = 3
+		self.bottom_offset = 40
 
 	def init(self):
 		pygame.init()
@@ -33,9 +36,18 @@ class Display:
 		textpos.centery = background.get_rect().centery
 		background.blit(text, textpos)
 
-		self.blitables.append(background)
-	
-	def load_main(self, words):
+		self.blitables.append((background, (0,0)))
+
+	def correct(self, column):
+		print "YEAHAHHAAH!" + str(column)
+		a = None
+
+	def incorrect(self, column):
+		print "NOONONONO!!" + str(column)
+		a = None
+
+	def load_main(self, words, difficulty):
+		self.difficulty = difficulty
 		self.clear()
 
 		# Fill background
@@ -43,13 +55,29 @@ class Display:
 		background = background.convert()
 		background.fill(self.bg_colour)
 
-		self.blitables.append(background)
+		self.blitables.append((background, (0,0)))
+
+		#match line
+		match_line = pygame.Surface((self.screen.get_width(), 20)).convert()
+		match_line.fill((255,255,255))
+		self.blitables.append((match_line, (0,self.screen.get_height()-self.bottom_offset)))
 		
 		self.words = words
 		for word in words:
-			word.surface = self.small_font.render(word.text, 1, (0,0,0))
+			colour = (0,0,0)
+			if (word.column == 1):
+				colour = (0,255,0)
+			elif (word.column == 2):
+				colour = (255,0,0)
+			elif (word.column == 3):
+				colour = (255, 255, 0)
+			elif (word.column == 4):
+				colour = (0,0,255)
+			elif (word.column == 5):
+				colour = (255,180,0)
+			word.surface = self.small_font.render(word.text, 1, colour)
 			word.pos = word.surface.get_rect()
-			word.pos.centerx = self.screen.get_width()/2
+			word.pos.centerx = (float(self.screen.get_width())/float(difficulty+2)) * float(word.column+1)
 
 		self.time_text = self.big_font.render("0", 1, (255,255,255))
 	
@@ -61,8 +89,7 @@ class Display:
 		self.time = time
 		for word in self.words:
 			if word.time >= time or word.time < time + self.time_window:
-				word.pos.centery = self.screen.get_height() - float(self.screen.get_height())/float(self.time_window) * float((word.time-time))
-				#print "word: " + word.text + " " + str(word.time) + " " + str(word.pos.centery)
+				word.pos.bottom = self.screen.get_height() - float(self.screen.get_height())/float(self.time_window) * float((word.time-time)) - self.bottom_offset
 				word.on_screen = True
 			else:
 				word.on_screen = False
@@ -72,10 +99,9 @@ class Display:
 	def draw(self):
 		# Blit everything to the screen
 		for blitable in self.blitables:
-			self.screen.blit(blitable, (0, 0))
+			self.screen.blit(blitable[0], blitable[1])
 		for word in self.words:
 			if word.on_screen:
-				#print "drawing word " + word.text + " at " + str(word.pos.left) + ", " + str(word.pos.top)
 				self.screen.blit(word.surface, word.pos)
 
 		self.screen.blit(self.time_text, (0,0))

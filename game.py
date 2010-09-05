@@ -2,6 +2,8 @@
 from gfx import *
 from word import *
 
+from random import randint
+
 class Game:
 	def __init__(self):
 		self.run = True
@@ -10,9 +12,29 @@ class Game:
 		self.level = 0
 		self.time_window = 5000
 		self.song_start_time = 0
+
+		self.difficulty = 5
+		self.error_margin = 500
+
 		self.all_words = [
-				Word(1000, "One") ,
-				Word(2000, "Two")]
+#				Word(1000, "One") ,
+#				Word(2000, "One") ,
+#				Word(3000, "One") ,
+#				Word(4000, "One") ,
+				Word(5000, "One") ,
+#				Word(6000, "One") ,
+#				Word(7000, "One") ,
+#				Word(8000, "One") ,
+#				Word(9000, "One") ,
+				Word(10000, "One") ,
+#				Word(11000, "One") ,
+#				Word(12000, "One") ,
+#				Word(13000, "One") ,
+#				Word(14000, "One") ,
+				Word(15000, "One") ,
+#				Word(16000, "One") ,
+#				Word(17000, "One") ,
+				Word(20000, "Two")]
 
 		self.display = Display(self.time_window)
 
@@ -34,6 +56,8 @@ class Game:
 			self.orange : 4
 		}
 
+		self.buttons_pressed = [False,False,False,False,False]
+
 		self.buttons = [self.green, self.red, self.yellow, self.blue, self.orange]
 
 	def init(self):
@@ -45,7 +69,25 @@ class Game:
 
 	def start_song(self):
 		self.song_start_time = pygame.time.get_ticks()
-		self.display.load_main(self.all_words)
+		for word in self.all_words:
+			word.column = randint(0, self.difficulty-1)
+		self.display.load_main(self.all_words, self.difficulty)
+	
+	def respond_to_strum_off(self, column):
+		self.buttons_pressed[column] = False
+
+	def respond_to_strum(self, column):
+		if (not self.buttons_pressed[column]):
+			self.buttons_pressed[column] = True
+			current_time = pygame.time.get_ticks() - self.song_start_time
+			for word in self.all_words:
+				if (word.column == column and 
+						word.time > current_time - self.error_margin and
+						word.time < current_time + self.error_margin):
+					self.display.correct(column)
+					return
+			self.display.incorrect(column)
+		
 
 	def process_input(self):
 		for event in pygame.event.get():
@@ -59,10 +101,14 @@ class Game:
 					self.level = 1
 					self.start_song()
 			elif event.type == JOYAXISMOTION:
-				if event.value != 0:
-					for button in self.buttons:
-						if self.guitar.get_button(self.sound_button_map[button]):
-							print "BUTTON " + str(button)
+				for button in self.buttons:
+					column = self.sound_button_map[button]
+					if self.guitar.get_button(button):
+						if event.value == 0:
+							self.respond_to_strum_off(column)
+						else:
+							self.respond_to_strum(column)
+
 				
 
 	def main_loop(self):
