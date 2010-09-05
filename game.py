@@ -36,6 +36,8 @@ class Game:
         self.start = 9
         self.select = 8
 
+        self.swears = []
+
         self.sound_button_map = {
             self.green : 0,
             self.red : 1,
@@ -60,7 +62,7 @@ class Game:
 
         self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
 
-        #game.all_words = [game.all_words[i] for i in range(6)]
+        self.all_words = [self.all_words[i] for i in range(6)]
         for word in self.all_words:
             print "fetching " + word.text
             try:
@@ -72,6 +74,22 @@ class Game:
                 word.audiofile = self.synthesize_word(word.text)
 
             word.sound = pygame.mixer.Sound(word.audiofile)
+
+        self.get_swears()
+
+    def get_swears(self):
+        for swear in ["fuck", "shit", "balls", "cunt", "dick"]:
+            word = Word(0, swear)
+            print "fetching " + word.text
+            try:
+                word.resp = self.forvo.queryWord(word.text)
+                word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
+                word.audiofile = self.forvo.postprocessAudio(word.audiofile)
+            except:
+                print "no swear " + swear
+                continue
+
+            self.swears.append(word)
        
     def synthesize_word(self, word):
         word_text_file = "tmp_word.txt"
