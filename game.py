@@ -85,12 +85,12 @@ class Game:
         
 
             word.sound = pygame.mixer.Sound(word.audiofile)
-            word.sound.set_volume(0.2)
+            word.sound.set_volume(0.7)
 
         self.get_swears()
 
     def get_swears(self):
-        for swear in ["fuck", "shit", "balls", "cunt", "dick"]:
+        for swear in ["fuck", "ass", "balls", "cunt", "dick"]:
             word = Word(0, swear)
             print "fetching " + word.text
             try:
@@ -163,7 +163,7 @@ class Game:
             for word in self.all_words:
                 if (word.time < time - self.error_margin and not word.hit):
                     word.hit = True
-                    self.display.incorrect(word.column)
+                    self.incorrect(word.column)
 
     def process_input(self):
         for event in pygame.event.get():
