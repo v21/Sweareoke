@@ -21,6 +21,10 @@ class Game:
         self.difficulty = 5
         self.error_margin = 500
 
+        self.time_delay = 3000
+        self.start_play = False
+        self.music_is_playing = False
+
         self.all_words = []
         
         self.display = Display(self.time_window)
@@ -123,7 +127,7 @@ class Game:
         for word in self.all_words:
             word.column = randint(0, self.difficulty-1)
         self.display.load_main(self.all_words, self.difficulty)
-        pygame.mixer.music.play()
+        self.start_play = True
     
     def respond_to_strum_off(self, column):
         self.buttons_pressed[column] = False
@@ -170,6 +174,8 @@ class Game:
             if event.type == QUIT:
                 self.run = False
             elif event.type == KEYDOWN:
+                if event.key == K_f:
+                    pygame.display.toggle_fullscreen()
                 if self.level == 0:
                     self.level = 1
                     self.start_song()
@@ -226,6 +232,9 @@ class Game:
         while (self.run):
             self.process_input()
             time = pygame.time.get_ticks() - self.song_start_time
+            if (self.start_play and self.time_delay < time and not self.music_is_playing):
+                pygame.mixer.music.play()
+                self.music_is_playing = True
             self.check_words(time)
             self.display.update(time)
             self.display.draw()
