@@ -37,6 +37,7 @@ class ForvoLibrary:
         url_end = "/language/en/order/rate-desc/key/"
 
         url = url_start + word + url_end + self.api_key
+        print "Opening url " + url
         f = urllib.urlopen(url)
 
         resp = ForvoResponse(json.load(f))
@@ -46,11 +47,11 @@ class ForvoLibrary:
         #print "dumped to file"
         return resp
 
-    def fetchRecording(self, resp, which):
+    def fetchRecording(self, resp, which, word):
         if (resp.num_recordings == 0) :
             raise NoRecordingsError
         url = resp.recordings[which]["ogg"]
-        filename = self.recording_loc + resp.recordings[which]["id"] + ".ogg"
+        filename = self.recording_loc + "/" + word + "_" + resp.recordings[which]["id"] + ".ogg"
         if os.path.exists(filename):
             return filename
         else:
@@ -64,7 +65,7 @@ class ForvoLibrary:
         for word in words:
             resp = self.queryWord(word)
             try:
-                filename = self.fetchRecording(resp,default_which)
+                filename = self.fetchRecording(resp,default_which, word)
                 if postProcess:
                     filename = self.postprocessAudio(filename)
                 filenames[word] = filename
