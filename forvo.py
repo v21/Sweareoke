@@ -24,8 +24,8 @@ class ForvoLibrary:
         except:
             self.cache = {}
             print "failed to load cache"
-        self.recording_loc = "sounds"
-
+        self.recording_loc = "sounds/"
+        self.recording_postproc_loc = "sounds/processed/"
 
     def queryWord(self, word):
 
@@ -50,14 +50,14 @@ class ForvoLibrary:
         if (resp.num_recordings == 0) :
             raise NoRecordingsError
         url = resp.recordings[which]["ogg"]
-        filename = self.recording_loc + "/" + resp.recordings[which]["id"] + ".ogg"
+        filename = self.recording_loc + resp.recordings[which]["id"] + ".ogg"
         if os.path.exists(filename):
             return filename
         else:
             urllib.urlretrieve(url, filename)
             return filename
 
-    def queryAndFetchMultiple(self, words):
+    def queryAndFetchMultiple(self, words, postProcess=False):
         words = list(set(words)) #uniquify
         default_which = 0
         filenames = {}
@@ -65,17 +65,22 @@ class ForvoLibrary:
             resp = self.queryWord(word)
             try:
                 filename = self.fetchRecording(resp,default_which)
+                if postProcess:
+                    filename = self.postprocessAudio(filename)
                 filenames[word] = filename
             except NoRecordingsError:
                 print "Couldn't find: " + word
 
         return filenames
 
-    def postprocessAudio(self, filename):
-        new_dir = "sounds/processed/"
+    def postprocessAudio(self, filename, force_reprocess=False):
         base_filename = filename.split("/")[-1]
-        retcode = call(["sox", filename, new_dir + base_filename, "silence", "1", "0.1", "3%"])
-        return new_dir + filename
+        new_filename = self.recording_postproc_loc + base_filename
+        if os.path.exists(new_filename) and not force_reprocess:
+            return new_filename
+        else:
+            retcode = call(["sox", filename, new_filename, "silence", "1", "0.1", "3%"])
+            return new_filename
 
 class NoRecordingsError(Exception):
     pass
