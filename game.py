@@ -103,8 +103,22 @@ class Game:
             if event.type == QUIT:
                 self.run = False
             elif event.type == KEYDOWN:
+                if self.level == 0:
+                    self.level = 1
+                    self.start_song()
+
+                elif event.key == K_y:
+                    self.respond_to_strum(0)
+
                 if event.key == K_ESCAPE:
                     self.run = False
+
+            elif event.type == KEYUP:
+                if self.level == 1:
+                    if event.key == K_y:
+                        self.respond_to_strum_off(0)
+
+                    
             elif event.type == JOYBUTTONDOWN:
                 if event.button in self.buttons:
                     if self.level == 0:
