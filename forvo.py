@@ -2,7 +2,8 @@ import urllib
 import json
 import re
 import os.path
-
+from subprocess import call
+import pickle
 
 class ForvoResponse:
     def __init__(self, jsonResp):
@@ -15,29 +16,34 @@ class ForvoResponse:
 class ForvoLibrary:
     def __init__(self):
         self.api_key = "32afdf084bda652565de09c55de855e3"
-        self.cache = {} # {"word":ForvoResponse(), ...}
+        self.cachePickled = "forvocache.pickle"
+        try:
+            with open(self.cachePickled) as f:
+                self.cache = pickle.load(f)
+                print "loaded: " + self.cache
+        except:
+            self.cache = {}
+            print "failed to load cache"
         self.recording_loc = "sounds"
-
-    def loadOldFiles(self):
-        files = os.listdir(self.recording_loc)
-        for file in files:
-            (name, ext) = os.path.spltext(file)
-            (word, underscore, key) = name.partition("_")
-            self.cache[word] = key
 
     def queryWord(self, word):
 
         if self.cache.has_key(word): #links will stop working after 2 hours. this aint a problem now.
+            print "returning from cache"
             return self.cache[word]
 
         url_start = "http://apifree.forvo.com/action/word-pronunciations/format/json/word/"
         url_end = "/language/en/order/rate-desc/key/"
 
         url = url_start + word + url_end + self.api_key
+        print "Opening url " + url
         f = urllib.urlopen(url)
 
         resp = ForvoResponse(json.load(f))
         self.cache[word] = resp
+        with open(self.cachePickled, "wb") as f:
+            pickle.dump(self.cache, f)
+        print "dumped to file"
         return resp
 
     def fetchRecording(self, resp, which, word):
@@ -65,6 +71,11 @@ class ForvoLibrary:
 
         return filenames
 
+    def postprocessAudio(self, filename):
+        new_dir = "sounds/processed/"
+        base_filename = filename.split("/")[-1]
+        retcode = call(["sox", filename, new_dir + base_filename, "silence", "1", "0.1", "3%"])
+        return new_dir + filename
 
 class NoRecordingsError(Exception):
     pass

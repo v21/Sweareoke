@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from gfx import *
 from word import *
+from forvo import *
 import wrapperpykar
 from random import randint
 import sys
@@ -15,6 +16,7 @@ class Game:
         self.song_start_time = 0
 
         self.song = None
+        self.word_sounds = {}
 
         self.difficulty = 5
         self.error_margin = 500
@@ -23,6 +25,7 @@ class Game:
         self.all_words = wrapperpykar.clean_syllables(lyrics)
         
         self.display = Display(self.time_window)
+        self.forvo = ForvoLibrary()
 
 
         self.red = 1
@@ -51,8 +54,10 @@ class Game:
         self.display.load_title()
         self.guitar = pygame.joystick.Joystick(0)
         self.guitar.init()
-        #self.start_song()
-
+        list_of_words = [word.text for word in self.all_words]
+        words_to_filenames = self.forvo.queryAndFetchMultiple(list_of_words)
+        for word in words_to_filenames:
+            self.word_sounds[word] = pygame.mixer.Sound(words_to_filenames[filename]) 
 
     def start_song(self):
         self.song_start_time = pygame.time.get_ticks()
