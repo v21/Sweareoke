@@ -56,7 +56,7 @@ class Game:
         self.display.init()
         self.display.load_title()
         self.song = pygame.mixer.music.load(self.filename)
-        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.set_volume(1)
         if (pygame.joystick.get_count() > 0):
             self.guitar = pygame.joystick.Joystick(0)
             self.guitar.init()
@@ -85,24 +85,25 @@ class Game:
         
 
             word.sound = pygame.mixer.Sound(word.audiofile)
-            word.sound.set_volume(0.7)
+            word.sound.set_volume(1)
 
         self.get_swears()
 
     def get_swears(self):
-        for swear in ["fuck", "ass", "balls", "cunt", "dick"]:
-            word = Word(0, swear)
-            print "fetching " + word.text
-            try:
-                word.resp = self.forvo.queryWord(word.text)
-                word.audiofile = self.forvo.fetchRecording(word.resp,0, word.resp.word)
-                word.audiofile = self.forvo.postprocessAudio(word.audiofile)
-                word.sound = pygame.mixer.Sound(word.audiofile)
-                word.sound.set_volume(1)
-                self.swears.append(word)
-            except:
-                print "no swear " + swear
-                continue
+        for i in range(4):
+            for swear in ["fuck", "ass", "balls", "cunt", "dick", "arse", "clunge", "tosh", "dick", "boob", "doo-doo", "damn", "buggering", "sugar"]:
+                word = Word(0, swear)
+                print "fetching " + word.text
+                try:
+                    word.resp = self.forvo.queryWord(word.text)
+                    word.audiofile = self.forvo.fetchRecording(word.resp,i, word.resp.word)
+                    word.audiofile = self.forvo.postprocessAudio(word.audiofile)
+                    word.sound = pygame.mixer.Sound(word.audiofile)
+                    word.sound.set_volume(0.8)
+                    self.swears.append(word)
+                except:
+                    print "no swear " + swear
+                    continue
 
        
     def synthesize_word(self, word):
@@ -145,6 +146,7 @@ class Game:
         try:
             channel = word.sound.play()
         except:
+            print "can't play" + word.text
             pass
         self.display.correct(word.column)
 
