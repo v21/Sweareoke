@@ -40,7 +40,7 @@ def clean_syllables(lyric_list):
         except: #if the lookahead fails, we're on the last lyric
             new_lyrics.append(lyric)
 
-        print "\n"
+        #print "\n"
 
     #finally, process to simpler format for joe's tiny mind
     return [word.Word(lyric.ms, lyric.text) for lyric in new_lyrics]
