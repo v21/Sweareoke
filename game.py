@@ -60,7 +60,7 @@ class Game:
 
         self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
         
-        game.all_words = [game.all_words[i] for i in range(6)]
+        #game.all_words = [game.all_words[i] for i in range(6)]
         for word in game.all_words:
             print word
         
