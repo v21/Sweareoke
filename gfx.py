@@ -65,15 +65,15 @@ class Display:
 		self.words = words
 		for word in words:
 			colour = (0,0,0)
-			if (word.column == 1):
+			if (word.column == 0):
 				colour = (0,255,0)
-			elif (word.column == 2):
+			elif (word.column == 1):
 				colour = (255,0,0)
-			elif (word.column == 3):
+			elif (word.column == 2):
 				colour = (255, 255, 0)
-			elif (word.column == 4):
+			elif (word.column == 3):
 				colour = (0,0,255)
-			elif (word.column == 5):
+			elif (word.column == 4):
 				colour = (255,180,0)
 			word.surface = self.small_font.render(word.text, 1, colour)
 			word.pos = word.surface.get_rect()
