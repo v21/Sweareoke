@@ -3,6 +3,12 @@ import pygame
 from pygame.locals import *
 from random import randint
 
+class Picture:
+    def __init__(self, surface, pos, time):
+        self.surface = surface
+        self.pos = pos
+        self.time = time
+
 class Display:
 
     def __init__(self, time_window):
@@ -13,6 +19,7 @@ class Display:
         self.screen = None
         self.bg_colour = (0,255,255)
         self.time = 0
+        self.last_time = 0
         self.time_window = time_window
         self.time_text = None
         self.difficulty = 3
@@ -24,6 +31,10 @@ class Display:
                 (255, 255, 0),
                 (0,0,255),
                 (255,180,0)]
+
+        self.correct_image = None
+        self.incorrect_image = None
+        self.pictures = []
 
     def make_buttons(self):
         buttons = []
@@ -41,6 +52,9 @@ class Display:
         self.big_font = pygame.font.Font(None, 100)
         self.small_font = pygame.font.Font(None, 60)
         self.buttons = self.make_buttons()
+
+        self.correct_image = pygame.image.load("images/correct.png")
+        self.incorrect_image = pygame.image.load("images/incorrect.png")
 
     def load_title(self):
         # Fill background
@@ -66,11 +80,17 @@ class Display:
 
     def correct(self, column):
         print "YEAHAHHAAH!" + str(column)
-        a = None
+        pictures.append(Picture(
+            correct_image, 
+            (column_centre(column+1), self.screen.get_height() - bottom_offset),
+            1000))
 
     def incorrect(self, column):
         print "NOONONONO!!" + str(column)
-        a = None
+        pictures.append(Picture(
+            incorrect_image, 
+            (column_centre(column+1), self.screen.get_height() - bottom_offset),
+            1000))
 
     def column_centre(self, column):
         return (float(self.screen.get_width())/float(7)) * float(column+1.5)
@@ -114,6 +134,8 @@ class Display:
         self.words = []
 
     def update(self, time):
+        delta = time - self.last_time
+        self.last_time = self.time
         self.time = time
         for word in self.words:
             if word.time >= time or word.time < time + self.time_window:
@@ -121,6 +143,11 @@ class Display:
                 word.on_screen = True
             else:
                 word.on_screen = False
+
+        for picture in self.pictures:
+            picture.time -= delta
+
+        pictures = [picture for picture in pictures if picture.time > 0]
 
 
         self.time_text = self.big_font.render(str(time), 1, (0, 0, 0))
@@ -140,7 +167,9 @@ class Display:
             if (self.buttons_pressed[i]):
                 self.screen.blit(button, (self.column_left(i), self.screen.get_height() - self.bottom_offset))
             i += 1
-            
+        
+        for picture in pictures:
+            self.screen.blit(picture.surface, picture.pos)
 
         pygame.display.flip()
 

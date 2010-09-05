@@ -48,14 +48,22 @@ class Game:
 
         self.buttons = [self.green, self.red, self.yellow, self.blue, self.orange]
 
+        self.filename = ""
+
     def init(self):
         self.display.init()
         self.display.load_title()
-        self.guitar = pygame.joystick.Joystick(0)
-        self.guitar.init()
         self.song = pygame.mixer.music.load(self.filename)
+        if (pygame.joystick.get_count() > 0):
+            self.guitar = pygame.joystick.Joystick(0)
+            self.guitar.init()
 
         self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
+        
+        game.all_words = [game.all_words[i] for i in range(6)]
+        for word in game.all_words:
+            print word
+        
         words = [word.text for word in self.all_words]
         filenames = self.forvo.queryAndFetchMultiple(words, True)
         for word in filenames:
@@ -135,5 +143,6 @@ if (__name__ == "__main__"):
         game.filename = sys.argv[1]
     else:
         game.filename = "american.kar"
+
     game.init()
     game.main_loop()
