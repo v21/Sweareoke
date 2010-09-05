@@ -1,7 +1,5 @@
 #!/usr/bin/python
-import gfx
 from gfx import *
-import word
 from word import *
 
 from random import randint
