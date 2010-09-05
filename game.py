@@ -59,16 +59,21 @@ class Game:
             self.guitar.init()
 
         self.all_words = wrapperpykar.clean_syllables(wrapperpykar.parse_midi(self.filename))
-        
-        #game.all_words = [game.all_words[i] for i in range(6)]
-        for word in game.all_words:
-            print word
-        
-        words = [word.text for word in self.all_words]
-        filenames = self.forvo.queryAndFetchMultiple(words, True)
-        for word in filenames:
-            self.word_sounds[word] = pygame.mixer.Sound(filenames[word])
 
+        #game.all_words = [game.all_words[i] for i in range(6)]
+        for word in self.all_words:
+            try:
+                word.resp = self.forvo.queryWord(word.text)
+            except NoRecordingsError:
+                continue
+            try:
+                word.audiofile = self.forvo.fetchRecording(word.resp,1, word.resp.word)
+                #if postProcess:
+                word.audiofile = self.forvo.postprocessAudio(word.audiofile)
+            except NoRecordingsError:
+                print "Couldn't find: " + word.text
+            self.sound = pygame.mixer.Sound(word.audiofile)
+        
     def start_song(self):
         self.song_start_time = pygame.time.get_ticks()
         for word in self.all_words:

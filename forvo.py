@@ -70,11 +70,11 @@ class ForvoLibrary:
         filenames = {}
         for word in words:
             try:
-                resp = self.queryWord(word)
+                resp = self.queryWord(word.text)
             except NoRecordingsError:
                 continue
             try:
-                filename = self.fetchRecording(resp,default_which, resp.word)
+                filename = self.fetchRecording(resp,default_which, resp.word.text)
                 if postProcess:
                     filename = self.postprocessAudio(filename)
                 filenames[word] = filename
