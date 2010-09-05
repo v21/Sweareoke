@@ -29,7 +29,10 @@ class ForvoLibrary:
     def queryWord(self, word):
         word = word.lower()
         m = re.match(r"\w+", word)
-        word = m.group(0)
+        if m:
+            word = m.group(0)
+        else:
+            raise NoRecordingsError
 
         if self.cache.has_key(word): #links will stop working after 2 hours. this aint a problem now.
             #print "returning from cache"
@@ -66,16 +69,19 @@ class ForvoLibrary:
         default_which = 0
         filenames = {}
         for word in words:
-            resp = self.queryWord(word)
-            word = resp.word #preserve cleaning
             try:
-                filename = self.fetchRecording(resp,default_which, word)
+                resp = self.queryWord(word)
+            except NoRecordingsError:
+                continue
+            try:
+                filename = self.fetchRecording(resp,default_which, resp.word)
                 if postProcess:
                     filename = self.postprocessAudio(filename)
                 filenames[word] = filename
             except NoRecordingsError:
                 print "Couldn't find: " + word
 
+        print filenames
         return filenames
 
     def postprocessAudio(self, filename, force_reprocess=False):
