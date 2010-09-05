@@ -2,7 +2,7 @@ import urllib
 import json
 import re
 import os.path
-
+from subprocess import call
 
 class ForvoResponse:
     def __init__(self, jsonResp):
@@ -58,6 +58,11 @@ class ForvoLibrary:
 
         return filenames
 
+    def postprocessAudio(self, filename):
+        new_dir = "sounds/processed/"
+        base_filename = filename.split("/")[-1]
+        retcode = call(["sox", filename, new_dir + base_filename, "silence", "1", "0.1", "3%"])
+        return new_dir + filename
 
 class NoRecordingsError(Exception):
     pass
